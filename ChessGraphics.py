@@ -1,5 +1,5 @@
 import pygame
-from ChessGame import ChessGame, Piece, King, Queen, Rook, Bishop, Knight, Pawn, format_to_nums, format_to_let
+from ChessEngine import ChessGame, Piece, King, Queen, Rook, Bishop, Knight, Pawn, format_to_nums, format_to_let
 
 pygame.init()
 
