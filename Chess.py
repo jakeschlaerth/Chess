@@ -125,7 +125,7 @@ def promotion(piece_to_move):
 
 
 def draw_pieces():
-    """draw each piece in game.piece_list"""
+    """draw each piece in game.piece_list """
     for piece in game.get_piece_list():
         if piece.get_color() == "white":
             if piece.get_callsign() == "P":
