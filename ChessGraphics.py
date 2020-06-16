@@ -200,18 +200,10 @@ def game_loop():
                             if square_to[1] == '1':
                                 promotion(piece_to_move)
 
-                # print(square_to)
                 game.make_move(square_from, square_to)
-                all_moves = engine.get_all_moves()
-                random_move = random.choice(tuple(all_moves))
-                # print(random_move)
-                game.make_move(random_move[0], random_move[1])
-                print(game.moves_made)
-                print(engine.evaluate())
-                # print(game.get_game_state())
-                # move the piece if possible
-                #piece_to_move = None
-                #square_to = None
+                if game.get_game_state() == "UNFINISHED":
+                    eval_move = engine.eval_move("black")
+                    game.make_move(eval_move[0], eval_move[1])
 
 
 game_loop()
