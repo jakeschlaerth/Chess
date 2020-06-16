@@ -7,10 +7,12 @@ class ChessGame:
     """
     an instance of a game of chess
     """
-    def __init__(self):
+
+    def __init__(self, moves_made=[]):
         """
         init board, game state, all pieces
         """
+        self.moves_made = moves_made  # this data member holds the list of moves made by both user and computer
         self._game_state = "UNFINISHED"
         self._turn = "white"
         self._board = [
@@ -21,9 +23,9 @@ class ChessGame:
             ["-", "-", "-", "-", "-", "-", "-", "-"],  # 5
             ["-", "-", "-", "-", "-", "-", "-", "-"],  # 6
             ["-", "-", "-", "-", "-", "-", "-", "-"],  # 7
-            ["-", "-", "-", "-", "-", "-", "-", "-"]   # 8
+            ["-", "-", "-", "-", "-", "-", "-", "-"]  # 8
             # a    b    c    d    e    f    g    h  
-            ]
+        ]
         white_pawn_a = Pawn(6, 0, "white")
         white_pawn_b = Pawn(6, 1, "white")
         white_pawn_c = Pawn(6, 2, "white")
@@ -72,6 +74,9 @@ class ChessGame:
         self._captured_list = []
         self.update_board()
         self.update_move_sets()
+
+        for move in self.moves_made:
+            self.make_move(move[0], move[1])
 
     def get_board(self):
         """
@@ -193,7 +198,7 @@ class ChessGame:
         reverted_cap_list = self.get_captured_list().copy()
         reverted_master_move_set_dict = dict()
         for piece in self.get_piece_list():
-            reverted_master_move_set_dict.update( {piece : piece.get_move_set().copy()})
+            reverted_master_move_set_dict.update({piece: piece.get_move_set().copy()})
         for piece in self.get_piece_list():
             if piece.get_color() == self.get_turn():
                 illegal_moves = set()
@@ -203,8 +208,7 @@ class ChessGame:
                 current_position = format_to_let(piece.get_rank(), piece.get_file())
                 for potential_move in piece.get_move_set():
                     self.test_move(current_position, potential_move)
-                    self.update_move_sets()  # this needs to be reverted for each piece, and we can do remove illegal
-                                             # operations on that reversion
+                    self.update_move_sets()  # this needs to be reverted for each piece
                     if self.is_in_check(color):
                         # this move is illegal
                         illegal_moves.add(potential_move)
@@ -424,6 +428,8 @@ class ChessGame:
         # update game state
         self.update_game_state()
 
+        self.moves_made.append((from_str, to_str))
+
         return True
 
     def castle(self):
@@ -443,7 +449,7 @@ class ChessGame:
                     print(self.get_board()[rank][file].get_callsign(), end="  ")
                 if self.get_board()[rank][file] == "-":
                     print(self.get_board()[rank][file], end="  ")
-            print(8-rank, end="")
+            print(8 - rank, end="")
             print()
         print("a  b  c  d  e  f  g  h")
 
@@ -453,6 +459,7 @@ class Piece:
     basics of each piece
     will be inherited by all pieces
     """
+
     def __init__(self, rank, file, color):
         """
         initiates a piece
@@ -535,6 +542,7 @@ class King(Piece):
     may move any direction 1 space
     can be in check
     """
+
     def __init__(self, rank, file, color):
         """
         initiates instance of king
@@ -545,6 +553,7 @@ class King(Piece):
         self._in_check = False
         self._callsign = "K"
         self._has_moved = False
+        self._strength = 900
 
     def get_has_moved(self):
         """
@@ -716,6 +725,7 @@ class Queen(Piece):
         """
         super().__init__(rank, file, color)
         self._callsign = "Q"
+        self._strength = 90
 
     def queen_logic(self, rank_delta, file_delta, board):
         """
@@ -755,7 +765,7 @@ class Queen(Piece):
         """
         # empty move set
         self.direct_set_move_set(set())
-        
+
         # diagonal
         # up and right
         for up_right in range(1, 8):
@@ -781,7 +791,7 @@ class Queen(Piece):
                 continue
             else:
                 break
-                
+
         # orthogonal
         for left in range(-1, -8, -1):
             if self.queen_logic(0, left, board):
@@ -813,6 +823,7 @@ class Queen(Piece):
 # class bishop (B)
 class Bishop(Piece):
     """"""
+
     def __init__(self, rank, file, color):
         """
         init instance of Bishop
@@ -821,7 +832,8 @@ class Bishop(Piece):
         """
         super().__init__(rank, file, color)
         self._callsign = "B"
-        
+        self._strength = 30
+
     def bishop_logic(self, rank_delta, file_delta, board):
         """
         adds specific moves to a bishop's move set
@@ -881,7 +893,7 @@ class Bishop(Piece):
             else:
                 break
         # down and right
-        for down_right in range(1,8):
+        for down_right in range(1, 8):
             if self.bishop_logic(down_right, down_right, board):
                 continue
             else:
@@ -891,13 +903,14 @@ class Bishop(Piece):
         self.direct_set_move_set({i for i in self.get_move_set() if i[0] >= 0 and i[1] >= 0})
         # convert to letter-number format
         self.direct_set_move_set({format_to_let(i[0], i[1]) for i in self.get_move_set()})
-    
-    
+
+
 # class knight (N)
 class Knight(Piece):
     """
     moves one point orthogonally and then one point diagonally away from its former position
     """
+
     def __init__(self, rank, file, color):
         """
         init instance of Knight
@@ -906,6 +919,7 @@ class Knight(Piece):
         """
         super().__init__(rank, file, color)
         self._callsign = "N"
+        self._strength = 30
 
     def knight_logic(self, rank_delta, file_delta, board):
         """
@@ -974,6 +988,7 @@ class Rook(Piece):
     moves any distance orthogonally
     may not jump over pieces
     """
+
     def __init__(self, rank, file, color):
         """
         initiates instance of Rook
@@ -983,6 +998,7 @@ class Rook(Piece):
         super().__init__(rank, file, color)
         self._callsign = "R"
         self._has_moved = False
+        self._strength = 50
 
     def get_has_moved(self):
         """
@@ -1052,7 +1068,7 @@ class Rook(Piece):
                 continue
             else:
                 break
-        for up in range( -1, -8, -1):
+        for up in range(-1, -8, -1):
             if self.rook_logic(up, 0, board):
                 continue
             else:
@@ -1068,6 +1084,7 @@ class Rook(Piece):
 class Pawn(Piece):
     """
     """
+
     def __init__(self, rank, file, color):
         """
         initiates instance of Pawn
@@ -1077,6 +1094,7 @@ class Pawn(Piece):
         super().__init__(rank, file, color)
         self._callsign = "P"
         self._promote_to = None
+        self._strength = 10
 
     def set_promote_to(self, promote_to):
         """
@@ -1228,7 +1246,7 @@ def format_to_nums(string):
     file = ord(string[0]) - 97
 
     # the absolute value of 8 - rank
-    rank = abs(8-(int(string[1:])))
+    rank = abs(8 - (int(string[1:])))
 
     return rank, file
 
@@ -1240,9 +1258,9 @@ def format_to_let(rank, file):
     :param file: number of a file, 0 - 7
     :return: chess coordinate str
     """
-    rank = str(8-rank)
-    file = chr(file+97)
-    return file+rank
+    rank = str(8 - rank)
+    file = chr(file + 97)
+    return file + rank
 
 
 if __name__ == '__main__':
@@ -1263,6 +1281,3 @@ if __name__ == '__main__':
     game.make_move("a7", "a8")
     game.make_move("b2", "a1")
     game.print_board()
-
-
-

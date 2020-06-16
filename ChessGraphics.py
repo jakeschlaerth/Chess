@@ -1,5 +1,7 @@
 import pygame
-from ChessEngine import ChessGame, Piece, King, Queen, Rook, Bishop, Knight, Pawn, format_to_nums, format_to_let
+import random
+from Chess import ChessGame, Piece, King, Queen, Rook, Bishop, Knight, Pawn, format_to_nums, format_to_let
+from Engine import Engine
 
 pygame.init()
 
@@ -11,11 +13,9 @@ pygame.display.set_caption('Chess')
 black = (0, 0, 0)
 white = (255, 255, 255)
 clock = pygame.time.Clock()
-# done = False
 board = pygame.image.load("images/board.png")
 game = ChessGame()
-# piece_to_move = None
-# square_to = None
+
 white_pawn_img = pygame.image.load('images/white-pawn.png')
 white_bishop_img = pygame.image.load("images/white-bishop.png")
 white_knight_img = pygame.image.load("images/white-knight.png")
@@ -30,7 +30,7 @@ black_rook_img = pygame.image.load("images/black-rook.png")
 black_queen_img = pygame.image.load("images/black-queen.png")
 black_king_img = pygame.image.load("images/black-king.png")
 game = ChessGame()
-# mouse_down_bool = False
+engine = Engine(game)
 
 
 def format_to_8x8(alg_coord):
@@ -157,6 +157,7 @@ def draw_pieces():
 
 
 def game_loop():
+
     done = False
     while not done:
         pygame.display.flip()  # update display
@@ -180,7 +181,6 @@ def game_loop():
                     piece_to_move = None
                 else:
                     piece_to_move = game.get_board()[coord_from[0]][coord_from[1]]
-                    print(piece_to_move)
 
             if event.type == pygame.MOUSEBUTTONUP:
                 mouse_up = event
@@ -200,9 +200,15 @@ def game_loop():
                             if square_to[1] == '1':
                                 promotion(piece_to_move)
 
-                print(square_to)
-                print(game.make_move(square_from, square_to))
-                print(game.get_game_state())
+                # print(square_to)
+                game.make_move(square_from, square_to)
+                all_moves = engine.get_all_moves()
+                random_move = random.choice(tuple(all_moves))
+                # print(random_move)
+                game.make_move(random_move[0], random_move[1])
+                print(game.moves_made)
+                print(engine.evaluate())
+                # print(game.get_game_state())
                 # move the piece if possible
                 #piece_to_move = None
                 #square_to = None
