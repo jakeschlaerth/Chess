@@ -124,6 +124,23 @@ def promotion(piece_to_move):
                 done = True
 
 
+def mouse_drag(piece_to_move):
+    """
+    upon mouse click, erase the piece to move's picture
+    place a picture of the piece to move on mouse location
+    return control to game_loop
+    :param piece_to_move: piece image to blit to mouse position
+    :return: none
+    """
+    while True:
+        print(piece_to_move)
+        for event in pygame.event.get():
+            mx, my = pygame.mouse.get_pos()
+            window.blit(white_pawn_img, (mx, my))
+            if event.type == pygame.MOUSEBUTTONUP:
+                break
+
+
 def draw_pieces():
     """draw each piece in game.piece_list """
     for piece in game.get_piece_list():
@@ -172,6 +189,7 @@ def game_loop():
                 # window.blit(white_pawn_img, (mx, my))
 
             if event.type == pygame.MOUSEBUTTONDOWN:
+
                 mouse_down = event
                 # assign piece_to_move
                 square_from = format_to_let(mouse_down.pos[1] // 64, mouse_down.pos[0] // 64)
@@ -181,6 +199,8 @@ def game_loop():
                     piece_to_move = None
                 else:
                     piece_to_move = game.get_board()[coord_from[0]][coord_from[1]]
+                if piece_to_move is not None:
+                    mouse_drag(piece_to_move)
 
             if event.type == pygame.MOUSEBUTTONUP:
                 mouse_up = event
@@ -201,9 +221,9 @@ def game_loop():
                                 promotion(piece_to_move)
 
                 game.make_move(square_from, square_to)
-                if game.get_game_state() == "UNFINISHED":
-                    eval_move = engine.eval_move("black")
-                    game.make_move(eval_move[0], eval_move[1])
+                # if game.get_game_state() == "UNFINISHED":
+                    # eval_move = engine.eval_move("black")
+                    # game.make_move(eval_move[0], eval_move[1])
 
 
 game_loop()
