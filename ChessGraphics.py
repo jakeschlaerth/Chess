@@ -124,23 +124,6 @@ def promotion(piece_to_move):
                 done = True
 
 
-def mouse_drag(piece_to_move):
-    """
-    upon mouse click, erase the piece to move's picture
-    place a picture of the piece to move on mouse location
-    return control to game_loop
-    :param piece_to_move: piece image to blit to mouse position
-    :return: none
-    """
-    while True:
-        print(piece_to_move)
-        for event in pygame.event.get():
-            mx, my = pygame.mouse.get_pos()
-            window.blit(white_pawn_img, (mx, my))
-            if event.type == pygame.MOUSEBUTTONUP:
-                break
-
-
 def draw_pieces():
     """draw each piece in game.piece_list """
     for piece in game.get_piece_list():
@@ -199,8 +182,6 @@ def game_loop():
                     piece_to_move = None
                 else:
                     piece_to_move = game.get_board()[coord_from[0]][coord_from[1]]
-                if piece_to_move is not None:
-                    mouse_drag(piece_to_move)
 
             if event.type == pygame.MOUSEBUTTONUP:
                 mouse_up = event

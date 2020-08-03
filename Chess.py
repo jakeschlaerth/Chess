@@ -432,12 +432,6 @@ class ChessGame:
 
         return True
 
-    def castle(self):
-        """
-        move the king and rook to the appropriate coordinates if the player chooses to castle
-        :return: None
-        """
-
     def print_board(self):
         """
         prints board to console, debugging purposes only
